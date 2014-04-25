@@ -1,6 +1,6 @@
 ## What is gemshine?
 
-Gemshine recursively searches a given path and reports back both the latest version and your Gemfile's version of each gem you have in that project.
+Gemshine recursively searches a given path for all ruby projects and reports back a table showing the latest version of each gem you have installed in addition the version supplied by that project's Gemfile.
 
 ### What problem does it solve and why is it useful?
 
