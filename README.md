@@ -1,8 +1,8 @@
-## What is gemshine and what problem does it solve?
+## What is gemshine?
 
-Gemshine recursively searches a given path and reports back both the latest and your Gemfile's version of each gem you have in that project.
+Gemshine recursively searches a given path and reports back both the latest version and your Gemfile's version of each gem you have in that project.
 
-### Why is this useful?
+### What problem does it solve and why is it useful?
 
 A typical rails project might have 40 or even 80 gems and keeping track of when a gem author updates each gem is painful.
 
@@ -24,7 +24,7 @@ A typical rails project might have 40 or even 80 gems and keeping track of when 
 1. Open a terminal.
 2. Type `gemshine path /some/path` and enjoy the show.
 
-### Example usage
+### Example usage and output
 
 After typing: `$ gemshine path /path/to/some/rails/app`
 
@@ -76,5 +76,5 @@ You would see a table similar to this:
 Here is an overview of the available commands. You can find out more information about each command and flag by simply
 running `gemshine <command name> help` from your terminal. You can also type `gemshine` on its own to see a list of all commands.
 
-- Get the latest gem versions for this project path and compare them to your Gemfile's version
+- Get the latest gem versions for this project and compare them to your Gemfile's version
     - `gemshine path <PROJECT_PATH>`
