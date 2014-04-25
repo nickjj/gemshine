@@ -4,7 +4,7 @@ Gemshine recursively searches a given path for all ruby projects and reports bac
 
 ### What problem does it solve and why is it useful?
 
-A typical rails project might have 40 or even 80 gems and keeping track of when a gem author updates each gem is painful.
+A typical rails project might have 40 or even 80 gems and keeping track of when a gem author updates each gem is painful. `bundle outdated` partly solves this problem but not quite.
 
 **To check for updates manually without gemshine** involves the following excruciating workflow:
 
@@ -18,6 +18,13 @@ A typical rails project might have 40 or even 80 gems and keeping track of when 
 8. Move onto the next project in your path.
 9. Repeat n times for each project you want to retrieve this information for.
 10. Get up and look in the mirror to see if you can see your eye spasm after doing this workflow only once.
+
+**To check for updates with bundle outdated instead of gemshine** involves the following mildly annoying workflow:
+
+1. Open a terminal.
+2. Type `bundle outdated` in a directory with a Gemfile or supply a path to a directory with a Gemfile.
+3. Repeat step 2 until you are done checking all of your projects.
+    - This is annoying when you have 15 rails projects to go through.
 
 **To check for updates with gemshine** involves the following awesome workflow:
 
