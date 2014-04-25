@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Nick Janetakis']
   spec.email         = ['nick.janetakis@gmail.com']
   spec.summary       = %q{Compare your ruby project's gem versions to their latest versions.}
-  spec.description   = %q{Enter a path and gemshine will recursively explore every ruby project and show you both the latest version and your current version of each gem in your Gemfile.}
+  spec.description   = %q{Enter a path and gemshine will recursively explore every ruby project and show you both the latest version and the current version of each gem in your Gemfile.}
   spec.homepage      = 'https://github.com/nickjj/gemshine'
   spec.license       = 'MIT'
 
