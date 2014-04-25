@@ -9,7 +9,7 @@ A typical rails project might have 40 or even 80 gems and keeping track of when 
 **To check for updates manually without gemshine** involves the following excruciating workflow:
 
 1. Open a path in your editor.
-2. Open a web browser and visit [rubygems.org](http://www.rubygems.org)
+2. Open a web browser and visit [rubygems.org](http://www.rubygems.org).
 3. Align them side by side.
 4. Goto a project's Gemfile in your editor.
 5. Search rubygems.org for the first gem in your list.
