@@ -12,7 +12,7 @@ class TestCLI < Minitest::Unit::TestCase
 
     assert_match /4 total gems/, out
 
-    system 'rm -rf /tmp/gemshine'
+    system "rm -rf #{TEST_PATH}"
   end
 
   def test_version
