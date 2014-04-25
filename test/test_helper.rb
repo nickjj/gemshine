@@ -1,5 +1,4 @@
 require 'minitest/autorun'
-require 'securerandom'
 
 module Gemshine
   module Test
