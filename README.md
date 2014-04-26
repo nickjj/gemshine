@@ -23,7 +23,8 @@ A typical rails project might have 40 or even 80 gems and keeping track of when 
 
 1. Open a terminal.
 2. Type `bundle outdated` in a directory with a Gemfile or supply a path to a directory with a Gemfile.
-3. Repeat step 2 until you are done checking all of your projects.
+3. Mentally parse out the gems you probably don't care about (dependencies of dependencies).
+4. Repeat step 2 and 3 until you are done checking all of your projects.
     - This is annoying when you have 15 rails projects to go through.
 
 **To check for updates with gemshine** involves the following awesome workflow:
