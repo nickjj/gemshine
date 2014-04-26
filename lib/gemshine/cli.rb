@@ -5,7 +5,7 @@ module Gemshine
   class CLI < Thor
     desc 'path PROJECT_PATH', ''
     long_desc <<-D
-      `gemshine path myapp` will recursively search through the myapp path and report the current vs latest gem versions for all ruby projects.
+      `gemshine path myapp` will recursively search through the myapp path and report the installed vs latest gem versions for all ruby projects.
     D
     def path(app_name)
       Command.new(app_name, options).path
