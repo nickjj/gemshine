@@ -42,7 +42,7 @@ module Gemshine
     private
 
       def ruby_project_directories
-        gemfile_paths = Dir[File.join(@root_path, '**', 'Gemfile')]
+        gemfile_paths = Dir.glob(File.join(@root_path, '**', 'Gemfile'))
 
         gemfile_paths.map { |gemfile| File.dirname(gemfile) }
       end
