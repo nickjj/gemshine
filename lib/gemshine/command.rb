@@ -60,7 +60,7 @@ module Gemshine
         lines = bundle_data.split("\n")
 
         gemfile_path = File.join(project_dir, 'Gemfile')
-        gemspec_path = Dir.glob("#{project_dir}/*.gemspec").first
+        gemspec_path = Dir.glob(File.join(project_dir, '*.gemspec')).first
         gemfile_contents = IO.read(gemfile_path)
 
         gemspec_path ? gemspec_contents = IO.read(gemspec_path) : gemspec_contents = ''
