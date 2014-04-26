@@ -7,6 +7,10 @@ module Gemshine
     include Thor::Shell
     include Thor::Actions
 
+    MSG_MISSING_GEMFILE = 'A Gemfile could not be found for:'
+    MSG_GATHER_OUTDATED = 'Gathering outdated top level gems for:'
+    MSG_UP_TO_DATE = 'Every top level gem is up to date for this project.'
+
     def initialize(app_name = '', options = {})
       @app_name = app_name
       @options = options
@@ -16,53 +20,18 @@ module Gemshine
     end
 
     def path
-      rows = []
-      gems_regex = ''
-      gems_total = 0
-
       ruby_project_directories.each do |project_dir|
         gemfile_path = File.join(project_dir, 'Gemfile')
+        project_name = File.basename(project_dir)
 
-        if File.exists?(gemfile_path)
-          File.open(gemfile_path, 'r').each_line do |line|
-            clean_gem_line = line.strip
+        log_project File.basename(project_dir)
 
-            if clean_gem_line.start_with?('gem ')
-              gem_info = parse_gemfile_line(clean_gem_line)
-
-              rows << gem_info
-
-              gems_regex << "^#{gem_info[0]}$|"
-
-              gems_total += 1
-            end
-          end
-
-          rows.sort!
-
-          log_project File.basename(project_dir)
-
-          if gems_regex.empty?
-            puts "There are no gems defined in this project's Gemfile"
-          else
-            rubygems_data = run("gem list '#{gems_regex[0...-1]}' --remote --all", capture: true)
-
-            parse_rubygems_response rubygems_data, rows
-
-            table = Terminal::Table.new title: File.basename(project_dir), headings: %w(Gem Gemfile Latest) do |t|
-              t.rows = rows
-              t.add_separator
-              t.add_row ["#{gems_total} total gems", '', '']
-            end
-
-            puts
-            puts table
-          end
-
-          rows = []
-          gems_regex = ''
-          gems_total = 0
+        unless File.exists?(gemfile_path)
+          log_missing project_name
+          next
         end
+
+        gem_table build_gem_list(bundle_outdated(project_dir), project_dir), project_name
       end
     end
 
@@ -72,54 +41,104 @@ module Gemshine
 
     private
 
-      def parse_gemfile_line(gem_line)
-        line_parts = gem_line.split(',')
-        gem_name = line_parts[0][5...-1]
-
-        if line_parts[1]
-          might_be_version = line_parts[1].strip
-        else
-          might_be_version = ''
-        end
-
-        if might_be_version && (might_be_version.start_with?('"') || might_be_version.start_with?("'"))
-          gem_version = line_parts[1][2...-1]
-        else
-          gem_version = '--------->'
-        end
-
-        [gem_name, gem_version, 'N/A']
-      end
-
-      def parse_rubygems_response(rubygems_data, gemlist_rows)
-        rubygems_parts = rubygems_data.split("\n")
-
-        rubygems_parts.to_enum.each_with_index do |gem_data, i|
-          gem_data_parts = gem_data.split
-
-          might_be_latest_gem_version = gem_data_parts[1][1..-1].strip
-
-          if might_be_latest_gem_version.end_with?(',')
-            latest_gem_version = might_be_latest_gem_version[0...-1]
-          else
-            latest_gem_version = might_be_latest_gem_version
-          end
-
-          gemlist_rows[i][2] = latest_gem_version
-        end
-      end
-
       def ruby_project_directories
-        rails_gemfiles = run("find #{@app_name} -type f -name Gemfile", capture: true)
-        gemfile_paths = rails_gemfiles.split("\n")
+        gemfiles = run("find #{@app_name} -type f -name Gemfile", capture: true)
+        gemfile_paths = gemfiles.split("\n")
 
         gemfile_paths.map { |gemfile| File.dirname(gemfile) }
       end
 
+      def bundle_outdated(path)
+        run "cd #{path} && bundle outdated && cd -", capture: true
+      end
+
+      def build_gem_list(data, project_dir)
+        plucked_gems(data, project_dir).map! { |gem| parse_gem_data(gem) }
+      end
+
+      def plucked_gems(bundle_data, project_dir)
+        lines = bundle_data.split("\n")
+
+        gemfile_path = File.join(project_dir, 'Gemfile')
+        gemspec_path = Dir.glob("#{project_dir}/*.gemspec").first
+        gemfile_contents = IO.read(gemfile_path)
+
+        gemspec_path ? gemspec_contents = IO.read(gemspec_path) : gemspec_contents = ''
+
+        lines.keep_if do |line|
+          line.strip!
+          line.start_with?('*')
+        end
+
+        lines.keep_if do |line|
+          parts = line.split
+
+          parts[0] == '*' ? is_gem_line = true : is_gem_line = false
+
+          is_gem_line ? name = parts[1][0..-1] : name = ''
+
+          expression = /\b#{name}\b/
+
+          is_gem_line && gemfile_contents.match(expression) || gemspec_contents.match(expression)
+        end
+
+        lines.map! { |line| line[2..-1] }
+      end
+
+      def parse_gem_data(line)
+        parts = line.split
+
+        name = parts[0]
+        ver_installed = parts[3][0...-1]
+        ver_latest = parts[1][1..-1]
+        ver_specific = parts[4]
+        ver_defined = ''
+        ver_operator = ''
+        ver_locked = ''
+
+        if ver_specific
+          ver_operator = parts[6][1..-1]
+          ver_locked = parts[7][0...-1]
+          ver_defined = "#{ver_operator} #{ver_locked}"
+        end
+
+        [name, ver_defined, ver_installed, ver_latest]
+      end
+
+      def gem_table(rows, title)
+        if rows.size == 0
+          log_up_to_date
+          return
+        end
+
+        rows.sort!
+
+        table = Terminal::Table.new title: title, headings: %w(Gem Defined Installed Latest), style: {width: 80} do |t|
+          t.rows = rows
+          t.add_separator
+          t.add_row ["#{rows.size} outdated gems", '', '', '']
+        end
+
+        puts
+        puts table
+      end
+
       def log_project(project_name)
         puts
-        say_status  'info', "\e[1mGathering the latest gem versions for:\e[0m", :yellow
-        say_status  'project', project_name, :cyan
+        say_status 'info', "\e[1m#{MSG_GATHER_OUTDATED}\e[0m", :yellow
+        say_status 'project', project_name, :cyan
+        puts
+      end
+
+      def log_up_to_date
+        puts
+        say_status 'nice', "#{MSG_UP_TO_DATE}", :magenta
+      end
+
+      def log_missing(project_name)
+        puts
+        say_status 'skip', "\e[1m#{MSG_MISSING_GEMFILE}\e[0m", :red
+        say_status 'project', project_name, :yellow
         puts
       end
   end
