@@ -7,13 +7,13 @@ module Gemshine
     long_desc <<-D
       `gemshine path myapp` will recursively search through the myapp path and report the installed vs latest gem versions for all ruby projects.
     D
-    def path(app_name)
-      Command.new(app_name, options).path
+    def path(root_path)
+      Command.new(root_path, options).path
     end
 
     desc 'version', ''
     long_desc <<-D
-      `gemshine --version` will print the current version.
+      `gemshine version` will print the current version.
     D
     def version
       Command.new.version

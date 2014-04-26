@@ -11,8 +11,8 @@ module Gemshine
     MSG_GATHER_OUTDATED = 'Gathering outdated top level gems for:'
     MSG_UP_TO_DATE = 'Every top level gem is up to date for this project.'
 
-    def initialize(app_name = '', options = {})
-      @app_name = app_name
+    def initialize(root_path = '', options = {})
+      @root_path = root_path
       @options = options
 
       self.destination_root = Dir.pwd
@@ -42,14 +42,15 @@ module Gemshine
     private
 
       def ruby_project_directories
-        gemfiles = run("find #{@app_name} -type f -name Gemfile", capture: true)
-        gemfile_paths = gemfiles.split("\n")
+        gemfile_paths = Dir[File.join(@root_path, '**', 'Gemfile')]
 
         gemfile_paths.map { |gemfile| File.dirname(gemfile) }
       end
 
       def bundle_outdated(path)
-        run "cd #{path} && bundle outdated && cd -", capture: true
+        pwd = Dir.pwd
+
+        run "cd #{path} && bundle outdated && cd #{pwd}", capture: true
       end
 
       def build_gem_list(data, project_dir)

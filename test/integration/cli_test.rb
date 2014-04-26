@@ -1,4 +1,5 @@
-require_relative '../test_helper'
+require 'fileutils'
+require_relative  File.join('..', 'test_helper')
 
 class TestCLI < Minitest::Unit::TestCase
   include Gemshine::Test
@@ -10,7 +11,9 @@ class TestCLI < Minitest::Unit::TestCase
       gemshine 'path Gemfile'
     end
 
-    assert_match /Gathering/, out
+    FileUtils.rm_rf TEST_PATH
+
+    assert_match '', out
   end
 
   def test_version
@@ -25,18 +28,16 @@ class TestCLI < Minitest::Unit::TestCase
 
     def create_dummy_gemfile
       gems = []
-      gems << 'gem "rails", "~> 4.1.0"'
+      gems << 'gem "rails", "~> 4.0.0"'
       gems << '       gem "sidekiq", "~> 2.17.4"'
       gems << 'gem "whenever", require: false'
       gems << 'gemwhenever",,,,d,,e'
       gems << 'gem "sdoc", "~> 0.4.0", require: false'
       gems << ' '
 
-      gemfile_path = File.join(TEST_PATH, 'Gemfile')
+      FileUtils.mkpath TEST_PATH
 
-      system "mkdir -p #{TEST_PATH}"
-
-      File.open(gemfile_path, 'w+') do |f|
+      File.open(TEST_GEMFILE, 'w+') do |f|
         gems.each { |element| f.puts(element) }
       end
     end
