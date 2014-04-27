@@ -20,12 +20,7 @@ module Gemshine
     end
 
     def path
-      directories = ruby_project_directories
-      @projects = directories.size
-
-      log_path_stats
-
-      directories.each do |project_dir|
+      ruby_project_directories.each do |project_dir|
         @project_dir = project_dir
         @project_name = File.basename(@project_dir)
         @gemfile_path = File.join(@project_dir, 'Gemfile')
@@ -49,6 +44,9 @@ module Gemshine
 
       def ruby_project_directories
         gemfile_paths = Dir.glob(File.join(@root_path, '**', 'Gemfile'))
+
+        @projects = gemfile_paths.size
+        log_path_stats
 
         gemfile_paths.map { |gemfile| File.dirname(gemfile) }
       end
