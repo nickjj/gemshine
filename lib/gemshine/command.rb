@@ -9,7 +9,7 @@ module Gemshine
 
     include UI
 
-    attr_accessor :project_dir, :project_name, :gemfile_path
+    attr_accessor :project_dir, :project_name, :projects, :gemfile_path
 
     def initialize(root_path = '', options = {})
       @root_path = root_path
@@ -20,7 +20,12 @@ module Gemshine
     end
 
     def path
-      ruby_project_directories.each do |project_dir|
+      directories = ruby_project_directories
+      @projects = directories.size
+
+      log_path_stats
+
+      directories.each do |project_dir|
         @project_dir = project_dir
         @project_name = File.basename(@project_dir)
         @gemfile_path = File.join(@project_dir, 'Gemfile')

@@ -2,6 +2,7 @@ require 'terminal-table'
 
 module Gemshine
   module UI
+    MSG_PATH_STATS = 'projects were detected, working...'
     MSG_MISSING_GEMFILE = 'A Gemfile could not be found for:'
     MSG_GATHER_OUTDATED = 'Gathering outdated top level gems for:'
     MSG_UP_TO_DATE = 'Every top level gem is up to date for this project.'
@@ -31,13 +32,19 @@ module Gemshine
       puts table
     end
 
+    def log_path_stats
+      puts
+      say_status 'stats', "#{@projects} #{MSG_PATH_STATS}", :yellow
+    end
+
     def log_project
-      log_status 'info', MSG_GATHER_OUTDATED, :yellow
+      log_status 'info', MSG_GATHER_OUTDATED, :blue
       log_project_name :cyan
     end
 
     def log_up_to_date
-      log_status 'nice', MSG_UP_TO_DATE, :magenta
+      puts
+      say_status 'nice', MSG_UP_TO_DATE, :magenta
     end
 
     def log_missing
