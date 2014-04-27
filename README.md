@@ -36,7 +36,7 @@ A typical rails project might have 40 or even 80 gems and keeping track of when 
 
 After typing: `$ gemshine path /path/to/some/rails/app`
 
-You would see a table similar to this and it also color coded it based on how out of date the gems are:
+You would see a table similar to this and it also color codes it based on how out of date the gems are:
 
 ```
 +-------------------------+-----------------+----------------+-----------------+
