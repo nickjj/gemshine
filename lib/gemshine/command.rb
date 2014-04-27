@@ -9,7 +9,7 @@ module Gemshine
 
     include UI
 
-    attr_accessor :project_dir, :project_name
+    attr_accessor :project_dir, :project_name, :gemfile_path
 
     def initialize(root_path = '', options = {})
       @root_path = root_path
@@ -23,12 +23,11 @@ module Gemshine
       ruby_project_directories.each do |project_dir|
         @project_dir = project_dir
         @project_name = File.basename(@project_dir)
-
-        gemfile_path = File.join(@project_dir, 'Gemfile')
+        @gemfile_path = File.join(@project_dir, 'Gemfile')
 
         log_project
 
-        unless File.exists?(gemfile_path)
+        unless File.exists?(@gemfile_path)
           log_missing
           next
         end
@@ -50,24 +49,32 @@ module Gemshine
       end
 
       def build_gem_list(data)
-        plucked_gems(data).map! { |gem| parse_gem_data(gem) }
+        plucked_gems(data).map! { |line| parse_gem_from(line) }
       end
 
       def plucked_gems(bundle_data)
-        lines = bundle_data.split("\n")
+        data = bundle_data.split("\n")
 
-        gemfile_path = File.join(@project_dir, 'Gemfile')
-        gemspec_path = Dir.glob(File.join(@project_dir, '*.gemspec')).first
-        gemfile_contents = IO.read(gemfile_path)
+        parse_out_gem_lines data
+        filter_top_level_gems data
 
-        gemspec_path ? gemspec_contents = IO.read(gemspec_path) : gemspec_contents = ''
+        data.map! { |line| line[2..-1] }
+      end
 
-        lines.keep_if do |line|
+      def parse_out_gem_lines(data)
+        data.keep_if do |line|
           line.strip!
           line.start_with?('*')
         end
+      end
 
-        lines.keep_if do |line|
+      def filter_top_level_gems(data)
+        gemspec_path = Dir.glob(File.join(@project_dir, '*.gemspec')).first
+        gemfile_contents = IO.read(@gemfile_path)
+
+        gemspec_path ? gemspec_contents = IO.read(gemspec_path) : gemspec_contents = ''
+
+        data.keep_if do |line|
           parts = line.split
 
           parts[0] == '*' ? is_gem_line = true : is_gem_line = false
@@ -78,11 +85,9 @@ module Gemshine
 
           is_gem_line && gemfile_contents.match(expression) || gemspec_contents.match(expression)
         end
-
-        lines.map! { |line| line[2..-1] }
       end
 
-      def parse_gem_data(line)
+      def parse_gem_from(line)
         parts = line.split
 
         name = parts[0]
