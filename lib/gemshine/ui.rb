@@ -5,9 +5,12 @@ module Gemshine
     MSG_PATH_STATS = 'projects were detected, working...'
     MSG_MISSING_GEMFILE = 'A Gemfile could not be found for:'
     MSG_GATHER_OUTDATED = 'Gathering outdated top level gems for:'
-    MSG_UP_TO_DATE = 'Every top level gem is up to date for this project.'
+    MSG_UP_TO_DATE = 'Every gem is up to date for this project.'
+    MSG_BUNDLE_ERROR = 'Bundler reported an issue with this project, here it is:'
+    MSG_BUNDLE_OUTDATED = 'Outdated gems included in the bundle'
+    MSG_BUNDLE_UP_TO_DATE = 'Your bundle is up to date'
 
-    def bundle_outdated_output
+    def run_bundle_outdated
       pwd = Dir.pwd
 
       run "cd #{@project_dir} && bundle outdated && cd #{pwd}", capture: true
@@ -50,6 +53,12 @@ module Gemshine
     def log_missing
       log_status 'skip', MSG_MISSING_GEMFILE, :red
       log_project_name :yellow
+    end
+
+    def log_bundle_message(message)
+      log_status 'warning', MSG_BUNDLE_ERROR, :red
+      say_status 'message', message, :yellow
+      puts
     end
 
     private

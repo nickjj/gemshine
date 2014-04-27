@@ -9,7 +9,7 @@ module Gemshine
 
     include UI
 
-    attr_accessor :project_dir, :project_name, :projects, :gemfile_path
+    attr_accessor :project_dir, :project_name, :projects, :gemfile_path, :bundle_outdated_output
 
     def initialize(root_path = '', options = {})
       @root_path = root_path
@@ -32,7 +32,19 @@ module Gemshine
           next
         end
 
-        gem_table build_gem_list(bundle_outdated_output)
+        @bundle_outdated_output = run_bundle_outdated
+
+        if @bundle_outdated_output.match(/#{MSG_BUNDLE_UP_TO_DATE}/)
+          log_up_to_date
+          next
+        end
+
+        unless @bundle_outdated_output.match(/#{MSG_BUNDLE_OUTDATED}/)
+          log_bundle_message @bundle_outdated_output
+          next
+        end
+
+        gem_table valid_gem_list
       end
     end
 
@@ -51,12 +63,12 @@ module Gemshine
         gemfile_paths.map { |gemfile| File.dirname(gemfile) }
       end
 
-      def build_gem_list(data)
-        plucked_gems(data).map! { |line| parse_gem_from(line) }
+      def valid_gem_list
+        plucked_gems.map! { |line| parse_gem_from(line) }
       end
 
-      def plucked_gems(bundle_data)
-        data = bundle_data.split("\n")
+      def plucked_gems
+        data = @bundle_outdated_output.split("\n")
 
         parse_out_gem_lines data
         filter_top_level_gems data
