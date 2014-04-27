@@ -1,4 +1,4 @@
-require 'terminal-table'
+require 'gemshine/ui'
 require 'gemshine/version'
 
 module Gemshine
@@ -7,9 +7,9 @@ module Gemshine
     include Thor::Shell
     include Thor::Actions
 
-    MSG_MISSING_GEMFILE = 'A Gemfile could not be found for:'
-    MSG_GATHER_OUTDATED = 'Gathering outdated top level gems for:'
-    MSG_UP_TO_DATE = 'Every top level gem is up to date for this project.'
+    include UI
+
+    attr_accessor :project_dir, :project_name
 
     def initialize(root_path = '', options = {})
       @root_path = root_path
@@ -21,17 +21,19 @@ module Gemshine
 
     def path
       ruby_project_directories.each do |project_dir|
-        gemfile_path = File.join(project_dir, 'Gemfile')
-        project_name = File.basename(project_dir)
+        @project_dir = project_dir
+        @project_name = File.basename(@project_dir)
 
-        log_project File.basename(project_dir)
+        gemfile_path = File.join(@project_dir, 'Gemfile')
+
+        log_project
 
         unless File.exists?(gemfile_path)
-          log_missing project_name
+          log_missing
           next
         end
 
-        gem_table build_gem_list(bundle_outdated(project_dir), project_dir), project_name
+        gem_table build_gem_list(bundle_outdated_output)
       end
     end
 
@@ -47,21 +49,15 @@ module Gemshine
         gemfile_paths.map { |gemfile| File.dirname(gemfile) }
       end
 
-      def bundle_outdated(path)
-        pwd = Dir.pwd
-
-        run "cd #{path} && bundle outdated && cd #{pwd}", capture: true
+      def build_gem_list(data)
+        plucked_gems(data).map! { |gem| parse_gem_data(gem) }
       end
 
-      def build_gem_list(data, project_dir)
-        plucked_gems(data, project_dir).map! { |gem| parse_gem_data(gem) }
-      end
-
-      def plucked_gems(bundle_data, project_dir)
+      def plucked_gems(bundle_data)
         lines = bundle_data.split("\n")
 
-        gemfile_path = File.join(project_dir, 'Gemfile')
-        gemspec_path = Dir.glob(File.join(project_dir, '*.gemspec')).first
+        gemfile_path = File.join(@project_dir, 'Gemfile')
+        gemspec_path = Dir.glob(File.join(@project_dir, '*.gemspec')).first
         gemfile_contents = IO.read(gemfile_path)
 
         gemspec_path ? gemspec_contents = IO.read(gemspec_path) : gemspec_contents = ''
@@ -104,43 +100,6 @@ module Gemshine
         end
 
         [name, ver_defined, ver_installed, ver_latest]
-      end
-
-      def gem_table(rows, title)
-        if rows.size == 0
-          log_up_to_date
-          return
-        end
-
-        rows.sort!
-
-        table = Terminal::Table.new title: title, headings: %w(Gem Defined Installed Latest), style: {width: 80} do |t|
-          t.rows = rows
-          t.add_separator
-          t.add_row ["#{rows.size} outdated gems", '', '', '']
-        end
-
-        puts
-        puts table
-      end
-
-      def log_project(project_name)
-        puts
-        say_status 'info', "\e[1m#{MSG_GATHER_OUTDATED}\e[0m", :yellow
-        say_status 'project', project_name, :cyan
-        puts
-      end
-
-      def log_up_to_date
-        puts
-        say_status 'nice', "#{MSG_UP_TO_DATE}", :magenta
-      end
-
-      def log_missing(project_name)
-        puts
-        say_status 'skip', "\e[1m#{MSG_MISSING_GEMFILE}\e[0m", :red
-        say_status 'project', project_name, :yellow
-        puts
       end
   end
 end
