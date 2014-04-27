@@ -24,15 +24,33 @@ module Gemshine
 
       rows.sort!
 
-      table = Terminal::Table.new title: @project_name, headings: %w(Gem Defined Installed Latest),
-                                  style: { width: 80 } do |t|
+      table = Terminal::Table.new title: set_color(@project_name, :cyan, :bold),
+                                  headings: table_headings,
+                                  style: { width: 70 } do |t|
         t.rows = rows
         t.add_separator
-        t.add_row ["#{rows.size} outdated gems", '', '', '']
+        t.add_row ["#{set_color(rows.size, :bold)} outdated gems", '', '', '']
       end
 
       puts
       puts table
+    end
+
+    def detect_outdated_color(installed, latest)
+      installed_parts = installed.split('.')
+      latest_parts = latest.split('.')
+      outdated_position = 2
+
+      version_comparison = installed_parts.zip(latest_parts).map { |a, b| a < b }
+
+      version_comparison.each_with_index do |outdated_digit, i|
+        if outdated_digit
+          outdated_position = i
+          break
+        end
+      end
+
+      digit_color outdated_position
     end
 
     def log_path_stats
@@ -61,6 +79,19 @@ module Gemshine
     end
 
     private
+
+      def table_headings
+        c_name = set_color('Gem', :bold)
+        c_defined = set_color('Defined', :bold)
+        c_installed = set_color('Installed', :bold)
+        c_latest = set_color('Latest', :bold)
+
+        [c_name, c_defined, c_installed, c_latest]
+      end
+
+      def digit_color(position)
+        position == 0 ? :red : :yellow
+      end
 
       def log_status(type, message, color)
         puts

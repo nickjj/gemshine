@@ -92,7 +92,7 @@ module Gemshine
         data.keep_if do |line|
           parts = line.split
 
-          parts[0] == '*' ? is_gem_line = true : is_gem_line = false
+          parts.first == '*' ? is_gem_line = true : is_gem_line = false
 
           is_gem_line ? name = parts[1][0..-1] : name = ''
 
@@ -105,7 +105,7 @@ module Gemshine
       def parse_gem_from(line)
         parts = line.split
 
-        name = parts[0]
+        name = parts.first
         ver_installed = parts[3][0...-1]
         ver_latest = parts[1][1..-1]
         ver_specific = parts[4]
@@ -119,7 +119,12 @@ module Gemshine
           ver_defined = "#{ver_operator} #{ver_locked}"
         end
 
-        [name, ver_defined, ver_installed, ver_latest]
+        [
+          name,
+          ver_defined,
+          set_color(ver_installed, detect_outdated_color(ver_installed, ver_latest)),
+          set_color(ver_latest, :green)
+        ]
       end
   end
 end
