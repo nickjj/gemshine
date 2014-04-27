@@ -57,8 +57,7 @@ module Gemshine
 
     def log_bundle_message(message)
       log_status 'warning', MSG_BUNDLE_ERROR, :red
-      say_status 'message', message, :yellow
-      puts
+      say_status 'message', message.strip!, :yellow
     end
 
     private
