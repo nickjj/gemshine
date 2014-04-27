@@ -34,12 +34,12 @@ module Gemshine
 
         @bundle_outdated_output = run_bundle_outdated
 
-        if @bundle_outdated_output.match(/#{MSG_BUNDLE_UP_TO_DATE}/)
+        if @bundle_outdated_output.match(/\b#{MSG_BUNDLE_UP_TO_DATE}\b/)
           log_up_to_date
           next
         end
 
-        unless @bundle_outdated_output.match(/#{MSG_BUNDLE_OUTDATED}/)
+        unless @bundle_outdated_output.match(/\b#{MSG_BUNDLE_OUTDATED}\b/)
           log_bundle_message @bundle_outdated_output
           next
         end
