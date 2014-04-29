@@ -1,7 +1,7 @@
 require 'fileutils'
 require_relative  File.join('..', 'test_helper')
 
-class TestCLI < Minitest::Unit::TestCase
+class TestCLI < Minitest::Test
   include Gemshine::Test
 
   def test_path
