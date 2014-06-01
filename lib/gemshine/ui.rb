@@ -41,7 +41,7 @@ module Gemshine
       latest_parts = latest.split('.')
       outdated_position = 2
 
-      version_comparison = installed_parts.zip(latest_parts).map { |a, b| b ||= 0 ; a < b }
+      version_comparison = installed_parts.zip(latest_parts).map { |a, b| b ||= '0' ; a < b }
 
       version_comparison.each_with_index do |outdated_digit, i|
         if outdated_digit
