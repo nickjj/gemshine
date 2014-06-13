@@ -78,7 +78,7 @@ You would see a table similar to this and it also color codes it based on how ou
 ## Commands
 
 Here is an overview of the available commands. You can find out more information about each command and flag by simply
-running `gemshine <command name> help` from your terminal. You can also type `gemshine` on its own to see a list of all commands.
+running `gemshine help <command name>` from your terminal. You can also type `gemshine` on its own to see a list of all commands.
 
 - Get the latest gem versions for this project and compare them to your installed version
     - `gemshine path <PROJECT_PATH>`
