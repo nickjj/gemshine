@@ -4,14 +4,14 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'gemshine/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'gemshine'
-  spec.version       = Gemshine::VERSION
-  spec.authors       = ['Nick Janetakis']
-  spec.email         = ['nick.janetakis@gmail.com']
-  spec.summary       = %q{Compare your ruby project's gem versions to their latest versions.}
-  spec.description   = %q{Enter a path and gemshine will recursively explore every ruby project and show you both the latest version and the current version of each gem in your Gemfile.}
-  spec.homepage      = 'https://github.com/nickjj/gemshine'
-  spec.license       = 'MIT'
+  spec.name        = 'gemshine'
+  spec.version     = Gemshine::VERSION
+  spec.authors     = ['Nick Janetakis']
+  spec.email       = ['nick.janetakis@gmail.com']
+  spec.summary     = %q{Compare your ruby project's gem versions to their latest versions.}
+  spec.description = %q{Enter a path and gemshine will recursively explore every ruby project and show you both the latest version and the current version of each gem in your Gemfile.}
+  spec.homepage    = 'https://github.com/nickjj/gemshine'
+  spec.license     = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
