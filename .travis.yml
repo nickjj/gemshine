@@ -1,0 +1,7 @@
+---
+language: ruby
+rvm:
+  - 2.1.2
+
+script:
+  - "ruby test/integration/cli_test.rb --verbose"
