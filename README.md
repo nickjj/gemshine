@@ -1,6 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/gemshine.png)](http://badge.fury.io/rb/gemshine) [![Build Status](https://secure.travis-ci.org/nickjj/gemshine.png)](http://travis-ci.org/nickjj/gemshine)
-
-## What is gemshine?
+## What is gemshine? [![Gem Version](https://badge.fury.io/rb/gemshine.png)](http://badge.fury.io/rb/gemshine) [![Build Status](https://travis-ci.org/nickjj/gemshine.svg?branch=master)](http://travis-ci.org/nickjj/gemshine)
 
 Gemshine recursively searches a given path for all ruby projects and reports back a table showing the latest version of each gem you have installed in addition to the version you have installed locally for that project.
 
